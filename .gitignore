@@ -16,6 +16,9 @@ env/
 .env.*
 !.env.example
 
+# --- локальные инструкции для Claude Code, не для репозитория ---
+CLAUDE.md
+
 # --- результаты прогонов пайплайна — не версионируем ---
 artifacts/*
 !artifacts/.gitkeep
