@@ -1,18 +1,46 @@
+# --- Python ---
 __pycache__/
-*.pyc
+*.py[cod]
+*.egg-info/
+.eggs/
+dist/
+build/
+
+# --- виртуальные окружения ---
 .venv/
 venv/
+env/
+
+# --- секреты / переменные окружения ---
 .env
 .env.*
 !.env.example
 
-# результаты прогонов пайплайна — не версионируем
+# --- результаты прогонов пайплайна — не версионируем ---
 artifacts/*
 !artifacts/.gitkeep
 
+# --- тесты / линт / тайпчек ---
 .pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
 .mypy_cache/
 .ruff_cache/
-*.egg-info/
-dist/
-build/
+.tox/
+
+# --- IDE / редакторы ---
+.vscode/
+.idea/
+*.swp
+
+# --- ОС-мусор ---
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# --- прочее временное ---
+*.log
+*.tmp
+*.bak
+.ipynb_checkpoints/
