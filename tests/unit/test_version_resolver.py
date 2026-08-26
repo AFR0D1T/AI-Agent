@@ -2,8 +2,12 @@ from bank_ai_agent.core.models import (
     ClassifiedDocument,
     CovenantDefinition,
     DocumentType,
+    RelatedPartyInfo,
 )
-from bank_ai_agent.resolution.version_resolver import pick_current_covenant_definitions
+from bank_ai_agent.resolution.version_resolver import (
+    pick_current_covenant_definitions,
+    pick_current_related_party_info,
+)
 
 
 def _covenant(source_doc_id: str, threshold: float) -> CovenantDefinition:
@@ -62,3 +66,21 @@ def test_missing_classified_document_is_skipped() -> None:
     result = pick_current_covenant_definitions([orphan], classified_by_doc_id={})
 
     assert result == []
+
+
+def test_pick_current_related_party_info_keeps_newest_per_account() -> None:
+    old = RelatedPartyInfo(
+        account_id="ACC-7801", ownership_threshold_pct=25.0, source_doc_id="doc-old"
+    )
+    new = RelatedPartyInfo(
+        account_id="ACC-7801", ownership_threshold_pct=34.0, source_doc_id="doc-new"
+    )
+    classified = {
+        "doc-old": _doc("doc-old", effective_date="2024-01-01", is_superseded=False),
+        "doc-new": _doc("doc-new", effective_date="2025-01-01", is_superseded=False),
+    }
+
+    result = pick_current_related_party_info([old, new], classified)
+
+    assert set(result) == {"ACC-7801"}
+    assert result["ACC-7801"].ownership_threshold_pct == 34.0
