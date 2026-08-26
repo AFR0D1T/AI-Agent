@@ -11,7 +11,7 @@ from datetime import date
 from enum import StrEnum
 from typing import Literal
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class Transaction(BaseModel):
@@ -162,7 +162,13 @@ class Scenario(BaseModel):
 
 
 class AnswerCellKey(BaseModel):
-    """Идентификатор ячейки, которую нужно заполнить (из шаблона ответа)."""
+    """Идентификатор ячейки, которую нужно заполнить (из шаблона ответа).
+
+    frozen=True — используется как ключ dict[AnswerCellKey, CovenantResult]
+    в assembly/answer_writer.py.
+    """
+
+    model_config = ConfigDict(frozen=True)
 
     scenario_id: str
     clause: str
