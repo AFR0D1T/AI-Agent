@@ -1,6 +1,18 @@
-"""JSON-схемы для structured output на границах LLM.
+"""JSON Schema для structured output на границах LLM.
 
-По одной схеме на каждый тип извлечения (классификация, договор, KYC, аудит).
-TODO: наполнить схемы под конкретные Pydantic-модели из core.models
-(например через model_json_schema()).
+Каждый экстрактор определяет свою локальную Pydantic-модель "что должен
+вернуть LLM" (осознанно отдельную от core.models — LLM не должен ни знать,
+ни придумывать служебные поля вроде doc_id/source_doc_id, их проставляет код
+после вызова). Эта функция — единственное место, которое знает, как достать
+JSON Schema из такой модели.
 """
+
+from __future__ import annotations
+
+from typing import Any
+
+from pydantic import BaseModel
+
+
+def schema_for(model: type[BaseModel]) -> dict[str, Any]:
+    return model.model_json_schema()

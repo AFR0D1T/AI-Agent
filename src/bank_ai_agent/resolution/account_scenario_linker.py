@@ -40,3 +40,17 @@ def build_scenarios(
         scenario.transactions.append(txn)
 
     return scenarios
+
+
+def account_to_scenario_map(scenarios: dict[str, Scenario]) -> dict[str, str]:
+    """account_id -> scenario_id, обратная к Scenario.account_ids.
+
+    Нужна там, где факт извлечён из документа и привязан к account_id (как он
+    написан в тексте), а дальше по пайплайну работает по scenario_id —
+    например resolution/version_resolver.py, resolution/ledger_adjuster.py.
+    """
+    return {
+        account_id: scenario_id
+        for scenario_id, scenario in scenarios.items()
+        for account_id in scenario.account_ids
+    }

@@ -5,6 +5,7 @@ import pytest
 
 from bank_ai_agent.core.models import Transaction
 from bank_ai_agent.resolution.account_scenario_linker import (
+    account_to_scenario_map,
     build_scenarios,
     scenario_id_from_txn_id,
 )
@@ -48,3 +49,12 @@ def test_build_scenarios_keeps_only_target_ids_and_groups_by_scenario() -> None:
     assert len(scenarios["P1"].transactions) == 2
     assert scenarios["B4"].account_ids == ["ACC-2"]
     assert len(scenarios["B4"].transactions) == 1
+
+
+def test_account_to_scenario_map() -> None:
+    transactions = [_txn("TXN-P1-0001", "ACC-1"), _txn("TXN-B4-0001", "ACC-2")]
+    scenarios = build_scenarios(transactions, target_scenario_ids=["P1", "B4"])
+
+    mapping = account_to_scenario_map(scenarios)
+
+    assert mapping == {"ACC-1": "P1", "ACC-2": "B4"}

@@ -30,6 +30,12 @@ class Transaction(BaseModel):
     amount: float | None
     currency: str
 
+    # Проставляются resolution/ledger_adjuster.py поверх сырых данных леджера
+    # (не приходят из CSV) — переклассификация аудитора и статус связанной
+    # стороны по данным KYC-досье.
+    category: str | None = None
+    is_related_party: bool = False
+
 
 class DocumentType(StrEnum):
     """Результат классификации документа. Расширяется под новые кейсы."""
@@ -71,9 +77,15 @@ class CovenantTestType(StrEnum):
 
 
 class CovenantDefinition(BaseModel):
-    """Структурированное условие ковенанта, извлечённое из кредитного договора."""
+    """Структурированное условие ковенанта, извлечённое из кредитного договора.
 
-    scenario_id: str
+    `account_id` — то, что реально написано в тексте документа (ACC-XXXX).
+    `scenario_id` документ не знает и знать не может — связку account_id ->
+    scenario_id даёт леджер (см. resolution/account_scenario_linker.py), она
+    проставляется отдельным шагом резолюции, а не на этапе извлечения.
+    """
+
+    account_id: str
     clause: str  # например "6.1"
     test_type: CovenantTestType
     threshold: float
@@ -83,9 +95,13 @@ class CovenantDefinition(BaseModel):
 
 
 class RelatedPartyInfo(BaseModel):
-    """Факты о связанных сторонах заёмщика из KYC-досье."""
+    """Факты о связанных сторонах заёмщика из KYC-досье.
 
-    scenario_id: str
+    `account_id` — как и в CovenantDefinition, это то, что написано в
+    документе; связка с scenario_id — на этапе резолюции.
+    """
+
+    account_id: str
     ownership_threshold_pct: float
     related_counterparties: list[str] = Field(default_factory=list)
     source_doc_id: str
