@@ -9,20 +9,25 @@ from __future__ import annotations
 
 from datetime import date
 from enum import StrEnum
-from typing import Literal
 
 from pydantic import BaseModel, Field
 
 
 class Transaction(BaseModel):
-    """Одна строка реестра транзакций."""
+    """Одна строка реестра транзакций.
+
+    `amount` может быть `None` — в леджере встречаются строки с пустой суммой
+    (часть намеренной "грязности" датасета, не ошибка парсинга). Решение, как
+    их трактовать (исключить из агрегатов, искать сумму в документах и т.п.),
+    принимается на уровне evaluation-стратегий, а не здесь.
+    """
 
     txn_id: str
     date: date
     account_id: str
     counterparty: str
     description: str
-    amount: float
+    amount: float | None
     currency: str
 
 
@@ -113,6 +118,7 @@ class Scenario(BaseModel):
 
     scenario_id: str
     account_ids: list[str] = Field(default_factory=list)
+    transactions: list[Transaction] = Field(default_factory=list)
 
 
 class AnswerCellKey(BaseModel):

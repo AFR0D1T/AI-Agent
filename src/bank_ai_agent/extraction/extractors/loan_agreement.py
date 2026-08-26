@@ -8,7 +8,11 @@ TODO: промпт extract_loan_agreement.md -> list[CovenantDefinition] (по �
 from __future__ import annotations
 
 from bank_ai_agent.core.llm.client import LLMProvider
-from bank_ai_agent.core.models import ClassifiedDocument, CovenantDefinition, RawDocument
+from bank_ai_agent.core.models import (
+    ClassifiedDocument,
+    CovenantDefinition,
+    RawDocument,
+)
 
 
 def extract(

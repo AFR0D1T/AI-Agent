@@ -7,9 +7,13 @@
 from __future__ import annotations
 
 from bank_ai_agent.core.models import CovenantTestType
-from bank_ai_agent.evaluation.strategies.absolute_cap_test import AbsoluteCapTestStrategy
+from bank_ai_agent.evaluation.strategies.absolute_cap_test import (
+    AbsoluteCapTestStrategy,
+)
 from bank_ai_agent.evaluation.strategies.base import CovenantStrategy
-from bank_ai_agent.evaluation.strategies.minimum_floor_test import MinimumFloorTestStrategy
+from bank_ai_agent.evaluation.strategies.minimum_floor_test import (
+    MinimumFloorTestStrategy,
+)
 from bank_ai_agent.evaluation.strategies.ratio_test import RatioTestStrategy
 from bank_ai_agent.evaluation.strategies.related_party_cap_test import (
     RelatedPartyCapTestStrategy,
