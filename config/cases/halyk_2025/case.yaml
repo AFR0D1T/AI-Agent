@@ -1,0 +1,22 @@
+# Конфиг конкретного кейса (Halyk AI Challenge). Всё специфичное для этой задачи
+# живёт здесь и в config/prompts/ — core/ ничего этого не знает (см. PLAN.md).
+
+data:
+  ledger_csv: "../../../../agentic-bank-public/master_ledger_2025.csv"
+  documents_dir: "../../../../agentic-bank-public/documents"
+  submission_template: "../../../../agentic-bank-public/submission_template.json"
+
+# Правило связки транзакция -> сценарий: scenario_id = второй сегмент txn_id
+# (TXN-<scenario_id>-<seq>). См. resolution/account_scenario_linker.py.
+txn_id_pattern: "TXN-{scenario_id}-{seq}"
+
+llm:
+  provider: gemini
+  model: gemini-2.5-flash
+  # api_key берётся из переменной окружения, не хранится в конфиге
+  api_key_env: GEMINI_API_KEY
+
+submission:
+  team: "TODO"
+  contact_email: "TODO"
+  model: "gemini-2.5-flash"
