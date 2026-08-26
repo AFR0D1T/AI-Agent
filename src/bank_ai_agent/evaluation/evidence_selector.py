@@ -1,9 +1,11 @@
 """Выбор evidence_txn_id: единственная транзакция, удаление которой меняет вердикт.
 
-Детерминированная проверка (не LLM, см. PLAN.md): для каждой транзакции-
-кандидата пересчитывается CovenantResult.status без неё; если status меняется
-ровно на одной транзакции — это и есть evidence_txn_id, иначе None (ratio- и
-агрегатные тесты по правилам оценки принимают null).
+Детерминированная проверка (не LLM, см. PLAN.md и CASE.ru.md): для каждой
+транзакции скорректированного леджера пересчитывается результат без неё; если
+status меняется ровно на одной транзакции — это и есть evidence_txn_id,
+иначе None (что и требуется для коэффициентных/агрегатных тестов). Работает
+одинаково для любой стратегии — вызывает CovenantStrategy.evaluate как чёрный
+ящик, не заглядывая в её внутреннюю логику.
 """
 
 from __future__ import annotations
@@ -18,4 +20,18 @@ def select_evidence(
     result: CovenantResult,
     strategy: CovenantStrategy,
 ) -> str | None:
-    raise NotImplementedError("TODO")
+    flipping: list[str] = []
+
+    for i, txn in enumerate(transactions):
+        remaining = transactions[:i] + transactions[i + 1 :]
+        try:
+            without_txn = strategy.evaluate(definition, remaining)
+        except ValueError:
+            continue  # например знаменатель обнулился без этой транзакции — не кандидат
+
+        if without_txn.status != result.status:
+            flipping.append(txn.txn_id)
+
+    if len(flipping) == 1:
+        return flipping[0]
+    return None

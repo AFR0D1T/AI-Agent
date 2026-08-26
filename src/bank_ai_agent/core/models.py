@@ -9,6 +9,7 @@ from __future__ import annotations
 
 from datetime import date
 from enum import StrEnum
+from typing import Literal
 
 from pydantic import BaseModel, Field
 
@@ -76,6 +77,23 @@ class CovenantTestType(StrEnum):
     RELATED_PARTY_CAP = "related_party_cap"
 
 
+class AmountFilter(BaseModel):
+    """Критерий отбора транзакций для одного агрегата (числитель/знаменатель/сумма).
+
+    В леджере нет колонки категории — состав "Налоги+Коммуналка", "Выручка" и
+    т.п. определяется по вхождению ключевых слов в description/counterparty
+    (без учёта регистра), плюс category, если она проставлена реклассификацией
+    аудитора (resolution/ledger_adjuster.py). Извлекается LLM из текста
+    договора (extraction/extractors/loan_agreement.py) — состав ключевых слов
+    для каждого пункта индивидуален, поэтому не зашит в код.
+    """
+
+    description_keywords: list[str] = Field(default_factory=list)
+    exclude_keywords: list[str] = Field(default_factory=list)
+    related_party_only: bool = False
+    sign: Literal["debit", "credit", "any"] = "any"
+
+
 class CovenantDefinition(BaseModel):
     """Структурированное условие ковенанта, извлечённое из кредитного договора.
 
@@ -83,6 +101,9 @@ class CovenantDefinition(BaseModel):
     `scenario_id` документ не знает и знать не может — связку account_id ->
     scenario_id даёт леджер (см. resolution/account_scenario_linker.py), она
     проставляется отдельным шагом резолюции, а не на этапе извлечения.
+
+    `numerator`/`denominator` заполняются для test_type=ratio, `aggregate` —
+    для остальных трёх типов (см. evaluation/strategies/*).
     """
 
     account_id: str
@@ -91,6 +112,9 @@ class CovenantDefinition(BaseModel):
     threshold: float
     currency: str | None = None
     source_doc_id: str
+    numerator: AmountFilter | None = None
+    denominator: AmountFilter | None = None
+    aggregate: AmountFilter | None = None
     raw_text: str
 
 

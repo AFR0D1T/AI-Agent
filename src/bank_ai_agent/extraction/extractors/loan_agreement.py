@@ -10,6 +10,7 @@ from pydantic import BaseModel, Field
 from bank_ai_agent.core.llm.client import LLMProvider
 from bank_ai_agent.core.llm.schemas import schema_for
 from bank_ai_agent.core.models import (
+    AmountFilter,
     ClassifiedDocument,
     CovenantDefinition,
     CovenantTestType,
@@ -23,6 +24,9 @@ class _CovenantItem(BaseModel):
     threshold: float
     currency: str | None = None
     raw_text: str
+    numerator: AmountFilter | None = None
+    denominator: AmountFilter | None = None
+    aggregate: AmountFilter | None = None
 
 
 class _LoanAgreementOutput(BaseModel):
@@ -56,6 +60,9 @@ def extract(
             currency=item.currency,
             source_doc_id=raw.doc_id,
             raw_text=item.raw_text,
+            numerator=item.numerator,
+            denominator=item.denominator,
+            aggregate=item.aggregate,
         )
         for item in parsed.covenants
     ]
